@@ -98,3 +98,6 @@ lto = "thin"
 incremental = true
 debug-assertions = true
 debug = true
+
+[lints.rust]
+unexpected_cfgs = { level = "warn" }
