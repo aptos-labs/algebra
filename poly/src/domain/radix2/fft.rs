@@ -359,15 +359,15 @@ const MIN_NUM_CHUNKS_FOR_COMPACTION: usize = 1 << 7;
 
 /// The minimum size of a chunk at which parallelization of `butterfly`s is
 /// beneficial. This value was chosen empirically.
-const MIN_GAP_SIZE_FOR_PARALLELIZATION: usize = 1 << 3;
+const MIN_GAP_SIZE_FOR_PARALLELIZATION: usize = 1 << 1;
 
 /// The minimum size of a chunk at which parallelization of `butterfly`s is
 /// beneficial. This value was chosen empirically.
-const MIN_INPUT_SIZE_FOR_PARALLELIZATION: usize = 1 << 3;
+const MIN_INPUT_SIZE_FOR_PARALLELIZATION: usize = 1 << 1;
 
 // minimum size at which to parallelize.
 #[cfg(feature = "parallel")]
-const LOG_ROOTS_OF_UNITY_PARALLEL_SIZE: u32 = 3;
+const LOG_ROOTS_OF_UNITY_PARALLEL_SIZE: u32 = 1;
 
 #[inline]
 fn bitrev(a: u64, log_len: u32) -> u64 {
