@@ -6,9 +6,13 @@ on:
 jobs:
   linkify:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
     - name: Checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+      with:
+        persist-credentials: true
     - name: Add links
       run: python3 scripts/linkify_changelog.py CHANGELOG.md
     - name: Commit

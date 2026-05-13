@@ -7,7 +7,7 @@ on:
         required: true
         type: choice
         # Currently only alpha and patch releases are supported by this workflow, due to https://github.com/rust-lang/cargo/issues/4242
-        options: 
+        options:
           - alpha
           - patch
       base_branch:
@@ -19,17 +19,22 @@ on:
 jobs:
   make-release-pr:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
     steps:
       - name: Install cargo-release
-        uses: taiki-e/install-action@v1
+        uses: taiki-e/install-action@9a29ce630c67077a359246f3e4f84941e05f28b5 # v1
         with:
           tool: cargo-release
 
-      - uses: actions/checkout@v3
-      - uses: cargo-bins/release-pr@v2
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          persist-credentials: true
+      - uses: cargo-bins/release-pr@0c019c0e5a6b9f722578d231d43ba900cacc5ffa # v2
         with:
           pr-template-file: .github/release-pr-template.ejs
           github-token: ${{ secrets.GITHUB_TOKEN }}
           version: ${{ inputs.version }}
           crate-release-all: true
-          base-branch: ${{ inputs.base_branch }} 
+          base-branch: ${{ inputs.base_branch }}
