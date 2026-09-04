@@ -99,5 +99,5 @@ incremental = true
 debug-assertions = true
 debug = true
 
-[lints.rust]
+[workspace.lints.rust]
 unexpected_cfgs = { level = "warn" }
