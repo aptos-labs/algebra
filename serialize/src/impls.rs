@@ -514,10 +514,13 @@ impl<T: CanonicalDeserialize> CanonicalDeserialize for Vec<T> {
         compress: Compress,
         validate: Validate,
     ) -> Result<Self, SerializationError> {
-        let len = u64::deserialize_with_mode(&mut reader, compress, validate)?
+        let len: usize = u64::deserialize_with_mode(&mut reader, compress, validate)?
             .try_into()
             .map_err(|_| SerializationError::NotEnoughSpace)?;
-        let mut values = Vec::with_capacity(len);
+
+        // don't allocate Vec before deserializing elements; otherwise, malicious length can cause
+        // a huge allocation
+        let mut values = Vec::new();
         for _ in 0..len {
             values.push(T::deserialize_with_mode(
                 &mut reader,
@@ -611,10 +614,12 @@ impl<T: CanonicalDeserialize> CanonicalDeserialize for VecDeque<T> {
         compress: Compress,
         validate: Validate,
     ) -> Result<Self, SerializationError> {
-        let len = u64::deserialize_with_mode(&mut reader, compress, validate)?
+        let len: usize = u64::deserialize_with_mode(&mut reader, compress, validate)?
             .try_into()
             .map_err(|_| SerializationError::NotEnoughSpace)?;
-        let mut values = VecDeque::with_capacity(len);
+        // don't allocate Vec before deserializing elements; otherwise, malicious length can cause
+        // a huge allocation
+        let mut values = VecDeque::new();
         for _ in 0..len {
             values.push_back(T::deserialize_with_mode(
                 &mut reader,

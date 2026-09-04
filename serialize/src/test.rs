@@ -308,3 +308,34 @@ fn test_serialize_macro() {
 
     assert_eq!(tuple_bytes, macro_bytes);
 }
+
+#[test]
+fn test_oversized_length_prefix_does_not_allocate() {
+    // A sequence whose declared length is far larger than the remaining input must fail on the
+    // missing elements. It must not be treated as an allocation request: `len` here is 2^55, which
+    // no allocator can satisfy, and 2^62, whose byte size overflows `isize`.
+    for len in [1u64 << 55, 1u64 << 62, u64::MAX] {
+        let bytes = len.to_le_bytes().to_vec();
+
+        for mode in [Compress::Yes, Compress::No] {
+            assert!(Vec::<Dummy>::deserialize_with_mode(&bytes[..], mode, Validate::No).is_err());
+            assert!(Vec::<u64>::deserialize_with_mode(&bytes[..], mode, Validate::No).is_err());
+            assert!(
+                VecDeque::<Dummy>::deserialize_with_mode(&bytes[..], mode, Validate::No).is_err()
+            );
+            assert!(String::deserialize_with_mode(&bytes[..], mode, Validate::No).is_err());
+            assert!(BigUint::deserialize_with_mode(&bytes[..], mode, Validate::No).is_err());
+        }
+    }
+}
+
+#[test]
+fn test_truncated_sequence_is_rejected() {
+    // The same thing at a realistic scale: a length prefix one element longer than the elements
+    // that follow it.
+    let mut bytes = Vec::new();
+    vec![Dummy; 4].serialize_compressed(&mut bytes).unwrap();
+    bytes[0] = 5;
+
+    assert!(Vec::<Dummy>::deserialize_compressed(&bytes[..]).is_err());
+}
